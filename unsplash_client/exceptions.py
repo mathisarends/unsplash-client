@@ -1,37 +1,44 @@
-class UnsplashException(Exception):
+class UnsplashClientException(Exception):
     def __init__(self, message: str, query: str | None = None) -> None:
         self.query = query
         super().__init__(message)
 
-class UnsplashTimeoutException(UnsplashException):
+
+class UnsplashTimeoutException(UnsplashClientException):
     pass
 
 
-class UnsplashAuthenticationException(UnsplashException):
+class UnsplashAuthenticationException(UnsplashClientException):
     pass
 
 
-class UnsplashRateLimitException(UnsplashException):
-    def __init__(self, message: str, query: str | None = None, retry_after: int | None = None) -> None:
+class UnsplashRateLimitException(UnsplashClientException):
+    def __init__(
+        self, message: str, query: str | None = None, retry_after: int | None = None
+    ) -> None:
         self.retry_after = retry_after
         super().__init__(message, query)
 
 
-class UnsplashNotFoundException(UnsplashException):
+class UnsplashNotFoundException(UnsplashClientException):
     pass
 
 
-class UnsplashServerException(UnsplashException):
-    def __init__(self, message: str, query: str | None = None, status_code: int | None = None) -> None:
+class UnsplashServerException(UnsplashClientException):
+    def __init__(
+        self, message: str, query: str | None = None, status_code: int | None = None
+    ) -> None:
         self.status_code = status_code
         super().__init__(message, query)
 
 
-class UnsplashClientException(UnsplashException):
-    def __init__(self, message: str, query: str | None = None, status_code: int | None = None) -> None:
+class UnsplashClientException(UnsplashClientException):
+    def __init__(
+        self, message: str, query: str | None = None, status_code: int | None = None
+    ) -> None:
         self.status_code = status_code
         super().__init__(message, query)
 
 
-class UnsplashValidationException(UnsplashException):
+class UnsplashValidationException(UnsplashClientException):
     pass

@@ -4,10 +4,8 @@ venv/
 __pycache__/
 *.py[cod]
 
-# VS Code
 .vscode/
 
-# Umgebungsvariablen
 .env
 
 temp
@@ -22,3 +20,6 @@ dist/
 *.egg
 
 .pytest_cache
+
+
+temp/
