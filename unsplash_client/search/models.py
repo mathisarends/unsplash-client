@@ -1,4 +1,5 @@
 from enum import StrEnum
+
 from pydantic import BaseModel, Field, HttpUrl
 
 
@@ -46,14 +47,14 @@ class UnsplashPhoto(BaseModel):
     color: str | None = None
     likes: int = 0
     created_at: str
-    
+
     @property
-    def url_regular(self) -> str:
+    def url(self) -> str:
         return str(self.urls.regular)
 
 
 class UnsplashSearchParams(BaseModel):
-    query: str
+    query: str = Field(min_length=3)
     per_page: int = 10
     orientation: Orientation = Orientation.LANDSCAPE
     content_filter: ContentFilter = ContentFilter.HIGH

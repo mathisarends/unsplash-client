@@ -1,3 +1,4 @@
+from .client import UnsplashClient
 from .exceptions import (
     UnsplashAuthenticationException,
     UnsplashClientException,
@@ -8,13 +9,18 @@ from .exceptions import (
     UnsplashValidationException,
 )
 from .search import (
+    ContentFilter,
+    OrderBy,
+    Orientation,
     UnsplashSearchParams,
     UnsplashSearchParamsBuilder,
     UnsplashSearchResponse,
 )
-from .service import UnsplashClient
 
 __all__ = [
+    "ContentFilter",
+    "OrderBy",
+    "Orientation",
     "UnsplashAuthenticationException",
     "UnsplashClient",
     "UnsplashClientException",

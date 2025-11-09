@@ -16,6 +16,7 @@ class UnsplashSearchParamsBuilder:
         self._content_filter = ContentFilter.HIGH
         self._page = 1
         self._order_by = OrderBy.RELEVANT
+        self._total_results_limit: int | None = None
 
     def with_query(self, query: str) -> Self:
         self._query = query
@@ -29,15 +30,15 @@ class UnsplashSearchParamsBuilder:
         self._orientation = orientation
         return self
 
-    def with_landscape(self) -> Self:
+    def with_landscape_orientation(self) -> Self:
         self._orientation = Orientation.LANDSCAPE
         return self
 
-    def with_portrait(self) -> Self:
+    def with_portrait_orientation(self) -> Self:
         self._orientation = Orientation.PORTRAIT
         return self
 
-    def with_squarish(self) -> Self:
+    def with_squarish_orientation(self) -> Self:
         self._orientation = Orientation.SQUARISH
         return self
 
@@ -61,12 +62,16 @@ class UnsplashSearchParamsBuilder:
         self._order_by = order
         return self
 
-    def with_relevant(self) -> Self:
+    def with_order_by_relevant(self) -> Self:
         self._order_by = OrderBy.RELEVANT
         return self
 
-    def with_latest(self) -> Self:
+    def with_order_by_latest(self) -> Self:
         self._order_by = OrderBy.LATEST
+        return self
+
+    def with_total_results_limit(self, limit: int) -> Self:
+        self._total_results_limit = limit
         return self
 
     def build(self) -> UnsplashSearchParams:
@@ -77,4 +82,5 @@ class UnsplashSearchParamsBuilder:
             content_filter=self._content_filter,
             page=self._page,
             order_by=self._order_by,
+            total_results_limit=self._total_results_limit,
         )
