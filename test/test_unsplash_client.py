@@ -4,15 +4,15 @@ from unittest.mock import Mock, patch
 import httpx
 import pytest
 
-from unsplash_client.client import UnsplashClient
-from unsplash_client.exceptions import (
+from unsplash_wrapper.client import UnsplashClient
+from unsplash_wrapper.exceptions import (
     UnsplashAuthenticationException,
     UnsplashClientException,
     UnsplashNotFoundException,
     UnsplashRateLimitException,
     UnsplashServerException,
 )
-from unsplash_client.search.models import (
+from unsplash_wrapper.search.models import (
     ContentFilter,
     OrderBy,
     Orientation,

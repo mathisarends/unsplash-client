@@ -1,5 +1,5 @@
 [project]
-name = "unsplash-client"
+name = "unsplash-wrapper"
 version = "0.1.0"
 description = "Python client for the Unsplash API"
 readme = "README.md"

@@ -1,6 +1,6 @@
 from typing import Self
 
-from unsplash_client.search.models import (
+from unsplash_wrapper.search.models import (
     ContentFilter,
     OrderBy,
     Orientation,

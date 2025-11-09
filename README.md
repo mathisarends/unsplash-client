@@ -15,7 +15,7 @@ Installation
 Requires Python 3.13+.
 
 ```bash
-pip install unsplash-client
+pip install unsplash-wrapper
 ```
 
 Set your Unsplash access key (Create one in your Unsplash developer dashboard):

@@ -4,7 +4,7 @@ from typing import overload
 import httpx
 from dotenv import load_dotenv
 
-from unsplash_client.exceptions import (
+from unsplash_wrapper.exceptions import (
     UnsplashAuthenticationException,
     UnsplashClientException,
     UnsplashNotFoundException,
@@ -12,15 +12,15 @@ from unsplash_client.exceptions import (
     UnsplashServerException,
     UnsplashTimeoutException,
 )
-from unsplash_client.search import (
+from unsplash_wrapper.search import (
     ContentFilter,
     OrderBy,
     Orientation,
     UnsplashSearchParams,
     UnsplashSearchResponse,
 )
-from unsplash_client.utils.decorators import async_retry
-from unsplash_client.utils.logging import LoggingMixin
+from unsplash_wrapper.utils.decorators import async_retry
+from unsplash_wrapper.utils.logging import LoggingMixin
 
 load_dotenv(override=True)
 

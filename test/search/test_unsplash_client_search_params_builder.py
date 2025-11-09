@@ -1,7 +1,7 @@
 import pytest
 
-from unsplash_client.search.builder import UnsplashSearchParamsBuilder
-from unsplash_client.search.models import ContentFilter, OrderBy, Orientation
+from unsplash_wrapper.search.builder import UnsplashSearchParamsBuilder
+from unsplash_wrapper.search.models import ContentFilter, OrderBy, Orientation
 
 
 def test_build_with_defaults():

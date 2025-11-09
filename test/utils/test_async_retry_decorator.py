@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from unsplash_client.utils.decorators import async_retry
+from unsplash_wrapper.utils.decorators import async_retry
 
 
 class LoggingMixinMock:
