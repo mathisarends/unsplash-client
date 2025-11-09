@@ -1,17 +1,9 @@
 from .client import UnsplashClient
-from .exceptions import (
-    UnsplashAuthenticationException,
-    UnsplashClientException,
-    UnsplashNotFoundException,
-    UnsplashRateLimitException,
-    UnsplashServerException,
-    UnsplashTimeoutException,
-    UnsplashValidationException,
-)
 from .search import (
     ContentFilter,
     OrderBy,
     Orientation,
+    UnsplashPhoto,
     UnsplashSearchParams,
     UnsplashSearchParamsBuilder,
     UnsplashSearchResponse,
@@ -21,15 +13,9 @@ __all__ = [
     "ContentFilter",
     "OrderBy",
     "Orientation",
-    "UnsplashAuthenticationException",
     "UnsplashClient",
-    "UnsplashClientException",
-    "UnsplashNotFoundException",
-    "UnsplashRateLimitException",
+    "UnsplashPhoto",
     "UnsplashSearchParams",
     "UnsplashSearchParamsBuilder",
     "UnsplashSearchResponse",
-    "UnsplashServerException",
-    "UnsplashTimeoutException",
-    "UnsplashValidationException",
 ]

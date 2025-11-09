@@ -16,6 +16,7 @@ from unsplash_wrapper.search import (
     ContentFilter,
     OrderBy,
     Orientation,
+    UnsplashPhoto,
     UnsplashSearchParams,
     UnsplashSearchResponse,
 )
@@ -41,7 +42,7 @@ class UnsplashClient(LoggingMixin):
     @overload
     async def search_photos(
         self, params: UnsplashSearchParams
-    ) -> UnsplashSearchResponse: ...
+    ) -> list[UnsplashPhoto]: ...
 
     @overload
     async def search_photos(
@@ -53,7 +54,7 @@ class UnsplashClient(LoggingMixin):
         content_filter: ContentFilter = ContentFilter.HIGH,
         page: int = 1,
         order_by: OrderBy = OrderBy.RELEVANT,
-    ) -> UnsplashSearchResponse: ...
+    ) -> list[UnsplashPhoto]: ...
 
     def _resolve_search_params(
         self,
@@ -82,7 +83,7 @@ class UnsplashClient(LoggingMixin):
         self,
         params: UnsplashSearchParams | None = None,
         **kwargs,
-    ) -> UnsplashSearchResponse:
+    ) -> list[UnsplashPhoto]:
         search_params = self._resolve_search_params(params, **kwargs)
 
         self.logger.info(
@@ -125,7 +126,7 @@ class UnsplashClient(LoggingMixin):
                         f"No photos found for query: '{search_params.query}'"
                     )
 
-                return search_response
+                return search_response.results
 
             except httpx.TimeoutException as e:
                 self.logger.error(

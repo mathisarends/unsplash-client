@@ -1,13 +1,15 @@
-Unsplash Client
+Unsplash Wrapper
 ================
 
-Lightweight, typed Python client for the [Unsplash API](https://unsplash.com/documentation) focusing on the photo search endpoint. Includes:
+Typed async Python client for the [Unsplash API](https://unsplash.com/documentation) focused on the photo search endpoint.
 
-- Async HTTP powered by `httpx`
-- Pydantic models for responses & request params
-- A fluent builder (`UnsplashSearchParamsBuilder`) for ergonomic query construction
-- Direct kwargs usage if you prefer no builder
-- Automatic retry on rate-limit responses (429) via the `async_retry` decorator
+Features:
+
+- Async HTTP via `httpx`
+- Pydantic models (requests & responses)
+- Fluent builder (`UnsplashSearchParamsBuilder`) OR direct kwargs
+- Returns a simple `list[UnsplashPhoto]`
+- Automatic retry of 429 (rate limit) responses
 
 Installation
 ------------
@@ -25,18 +27,35 @@ export UNSPLASH_API_KEY=your_access_key_here  # macOS/Linux
 $env:UNSPLASH_API_KEY='your_access_key_here'  # PowerShell
 ```
 
-Quick Start
------------
+Quick Start (async)
+-------------------
 
 ```python
-from unsplash_client import UnsplashClient
+from unsplash_wrapper import UnsplashClient
 
-client = UnsplashClient()  # Uses UNSPLASH_API_KEY from environment
-response = await client.search_photos(query="mountains")
-
-print("Total found:", response.total)
-for photo in response.results:
+client = UnsplashClient()
+photos = await client.search_photos(query="mountains")
+for photo in photos:
 	print(photo.id, photo.url)
+```
+
+Sync Usage Helper
+-----------------
+
+If you're not already inside an async context:
+
+```python
+import asyncio
+from unsplash_wrapper import UnsplashClient
+
+def main() -> None:
+	client = UnsplashClient()
+	photos = asyncio.run(client.search_photos(query="ocean"))
+	for p in photos:
+		print(p.id, p.url)
+
+if __name__ == "__main__":
+	main()
 ```
 
 Search Parameter Options
@@ -47,7 +66,7 @@ You can provide parameters in two styles: Builder or Raw kwargs.
 ### 1. Builder style
 
 ```python
-from unsplash_client import (
+from unsplash_wrapper import (
 	UnsplashClient,
 	UnsplashSearchParamsBuilder,
 	Orientation,
@@ -67,9 +86,10 @@ builder = (
 
 params = builder.build()
 client = UnsplashClient()
-response = await client.search_photos(params)
+photos = await client.search_photos(params)
 
-print(f"Returned {len(response.results)} of {response.total} total")
+for photo in photos:
+	print(photo.id, photo.description, photo.url)
 ```
 
 ### 2. Direct kwargs style
@@ -77,98 +97,90 @@ print(f"Returned {len(response.results)} of {response.total} total")
 All fields mirror the Pydantic model `UnsplashSearchParams`:
 
 ```python
-from unsplash_client import UnsplashClient, Orientation, ContentFilter, OrderBy
+from unsplash_wrapper import UnsplashClient, Orientation, ContentFilter, OrderBy
 
 client = UnsplashClient()
-response = await client.search_photos(
-	query="architecture",
-	per_page=15,
-	orientation=Orientation.PORTRAIT,
-	content_filter=ContentFilter.HIGH,
-	page=1,
-	order_by=OrderBy.RELEVANT,
+photos = await client.search_photos(
+    query="architecture",
+    per_page=15,
+    orientation=Orientation.PORTRAIT,
+    content_filter=ContentFilter.HIGH,
+    page=1,
+    order_by=OrderBy.RELEVANT,
 )
 
-for p in response.results:
-	print(p.id, p.user.username)
+for photo in photos:
+    print(photo.id, photo.user.username)
 ```
 
 Models Overview
 ---------------
 
-```python
-from unsplash_client import UnsplashSearchResponse
+`UnsplashPhoto` attributes:
 
-# UnsplashSearchResponse fields:
-# total: int               -> total matching results
-# total_pages: int         -> number of pages available
-# results: list[UnsplashPhoto]
-#
-# UnsplashPhoto exposes convenient properties like:
-# photo.url (regular size URL)
+```
+id: str
+description: str | None
+alt_description: str | None
+urls: UnsplashUrls (raw/full/regular/small/thumb)
+user: UnsplashUser (username, name, portfolio_url, ...)
+width, height, color, likes, created_at
+url (property -> regular URL string)
 ```
 
 Error Handling
 --------------
 
-The client raises typed exceptions from `unsplash_client.exceptions`:
+Exceptions from `unsplash_wrapper.exceptions`:
 
-- `UnsplashAuthenticationException` – missing/invalid key (401)
-- `UnsplashNotFoundException` – resource not found (404)
-- `UnsplashRateLimitException` – rate limited (429) (contains `retry_after` if provided)
-- `UnsplashServerException` – server error 5xx
-- `UnsplashClientException` – other 4xx errors
-- `UnsplashTimeoutException` – request timed out
-
-Example:
+- `UnsplashAuthenticationException` (401)
+- `UnsplashNotFoundException` (404)
+- `UnsplashRateLimitException` (429) — includes `retry_after` if provided
+- `UnsplashServerException` (5xx)
+- `UnsplashClientException` (other 4xx)
+- `UnsplashTimeoutException` (request timeout)
 
 ```python
-from unsplash_client import (
-	UnsplashClient,
-	UnsplashRateLimitException,
-	UnsplashAuthenticationException,
+from unsplash_wrapper import (
+    UnsplashClient,
+    UnsplashRateLimitException,
+    UnsplashAuthenticationException,
 )
 
 client = UnsplashClient()
-
 try:
-	response = await client.search_photos(query="forest")
+    photos = await client.search_photos(query="forest")
 except UnsplashRateLimitException as e:
-	if e.retry_after:
-		print(f"Rate limited; retry after {e.retry_after}s")
-	else:
-		print("Rate limited; no retry window provided")
+    msg = f"retry after {e.retry_after}s" if e.retry_after else "no retry window"
+    print("Rate limited:", msg)
 except UnsplashAuthenticationException:
-	print("Invalid API key configured")
+    print("Invalid API key configured")
 ```
 
 Retry Behavior
 --------------
 
-`search_photos` automatically retries 429 responses up to 3 times with exponential backoff (1s, 2s, 4s). Other errors fail fast.
+429 responses are retried up to 3 times (delays: 1s → 2s → 4s). Other failures propagate immediately.
 
 Logging
 -------
 
-The client uses a library-specific logger name: `unsplash_client.UnsplashClient`. Attach handlers or configure globally:
+Logger name: `unsplash_wrapper.UnsplashClient`
 
 ```python
 import logging
-
 logging.basicConfig(level=logging.INFO)
 ```
 
-Advanced: Custom Param Object
-------------------------------
-
-If you need to construct params manually (validation enforced):
+Advanced: Manual Params
+-----------------------
 
 ```python
-from unsplash_client import UnsplashSearchParams, Orientation
+from unsplash_wrapper import UnsplashSearchParams, UnsplashClient, Orientation
 
 params = UnsplashSearchParams(query="minimal", per_page=5, orientation=Orientation.SQUARISH)
 client = UnsplashClient()
-response = await client.search_photos(params)
+photos = await client.search_photos(params)
 ```
 
 Development
@@ -183,5 +195,5 @@ uv run pytest -q
 Type check (if mypy configured):
 
 ```bash
-mypy unsplash_client
+mypy unsplash_wrapper
 ```
